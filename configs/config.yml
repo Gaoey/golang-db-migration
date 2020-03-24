@@ -1,0 +1,16 @@
+mariadb:
+  username: "root"
+  password: "password"
+  database: "todolist"
+  host: "localhost"
+  port: "3306"
+  datasource: "PROTOCOL=TCPIP;"
+  maxidle: 50
+  maxopen: 50
+  maxlifetime: 30m
+  timeout: 5s
+  readtimeout: 5s
+  writetimeout: 5s
+  parsetime: true
+  debug: true
+  multistatement: true
