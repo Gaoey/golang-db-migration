@@ -4,8 +4,12 @@ using golang-migrate
 see more. https://github.com/golang-migrate/migrate
 
 tutorial by mysql
-
-## Step
+## Docker Compose
+``` 
+$ docker-compose build --no-cache
+$ docker-compuse up -d
+```
+## Manual Step
 1. install docker
 2. pull mysql image
 3. set username & pass word for mysql container as 

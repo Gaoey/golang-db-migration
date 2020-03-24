@@ -8,8 +8,8 @@ import (
 	"os"
 
 	_ "github.com/go-sql-driver/mysql"
-	"github.com/golang-migrate/migrate/v4"
-	"github.com/golang-migrate/migrate/v4/database/mysql"
+	"github.com/golang-migrate/migrate"
+	"github.com/golang-migrate/migrate/database/mysql"
 	_ "github.com/golang-migrate/migrate/v4/source/file"
 )
 
@@ -17,6 +17,7 @@ func main() {
 	var migrationDir = flag.String("migration.files", "./migration", "Directory where the migration files are located ?")
 	var mysqlDSN = "root:password@/todolist"
 
+	fmt.Printf("2")
 	flag.Parse()
 
 	db, err := sql.Open("mysql", mysqlDSN)
@@ -48,5 +49,6 @@ func main() {
 
 	log.Println("Database migrated")
 	// actual logic to start your application
+	fmt.Printf("finish")
 	os.Exit(0)
 }

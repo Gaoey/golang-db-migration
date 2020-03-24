@@ -1,0 +1,30 @@
+version: '3'
+services:
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_ROOT_PASSWORD: password
+      MYSQL_DATABASE: todolist
+    container_name: golang_db
+    networks:
+      - bridge
+    ports:
+      - "3306:3306"
+      
+  app:
+    build:
+      context: . # Use an image built from the specified dockerfile in the current directory.
+      dockerfile: Dockerfile
+    container_name: golang_app
+    command: sleep 7200
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - db
+    networks:
+      - bridge
+  
+networks:
+  bridge:
