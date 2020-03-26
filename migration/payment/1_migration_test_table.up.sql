@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS `todo` (
+CREATE TABLE IF NOT EXISTS `migration_test_1` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `title` varchar(100) COLLATE utf8_unicode_ci DEFAULT NULL,
   `description` varchar(256) COLLATE utf8_unicode_ci DEFAULT NULL,
@@ -6,7 +6,7 @@ CREATE TABLE IF NOT EXISTS `todo` (
   PRIMARY KEY (`id`)
 );
 
-CREATE TABLE IF NOT EXISTS `user` (
+CREATE TABLE IF NOT EXISTS `migration_test_2` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `first_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,
   `last_name` varchar(50) COLLATE utf8_unicode_ci DEFAULT NULL,

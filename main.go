@@ -3,10 +3,12 @@ package main
 import (
 	"database/sql"
 	"flag"
+	"fmt"
 	"log"
 	"os"
-	"strconv"
 	"time"
+	"tutorial/dbvcs/services/payment"
+	"tutorial/dbvcs/services/transfer"
 
 	"github.com/go-sql-driver/mysql"
 	"github.com/golang-migrate/migrate/v4"
@@ -50,13 +52,25 @@ func initDB() (*sql.DB, error) {
 	return db, nil
 }
 
+var tableList = []string{"payment", "transfer"}
+
 func main() {
 	initialize()
 
-	forceFlag := flag.String("force", "-1", "force version")
-	stepFlag := flag.String("step", "", "up version")
+	forceFlag := flag.Int("force", -1, "force version")
+	stepFlag := flag.String("step", "", "step up or down")
+	tableFlag := flag.String("table", "", "table selected")
+	onlyStateFlag := flag.Bool("only-state", false, "migrate only database state")
 
 	flag.Parse()
+
+	if *stepFlag == "" {
+		log.Fatalf("\nmandatory command -step \nexample -step=\"up\" or  -step=\"down\"")
+	}
+
+	if *tableFlag == "" && !contains(tableList, *tableFlag) {
+		log.Fatalf("\nplease selected table 'payment' or 'transfer' to migration \nexample -table=\"payment\"")
+	}
 
 	db, err := initDB()
 	if err != nil {
@@ -72,38 +86,61 @@ func main() {
 		log.Fatalf("could not start sql migration... %v", err)
 	}
 
-	m, err := migrate.NewWithDatabaseInstance("file://migration/", "mysql", driver)
+	migrationFile := fmt.Sprintf("file://migration/%s", *tableFlag)
+	m, err := migrate.NewWithDatabaseInstance(migrationFile, "mysql", driver)
 	if err != nil {
 		log.Fatalf("migration failed... %v", err)
 	}
 
-	// force version
-	forceVersion, err := strconv.Atoi(*forceFlag)
-	if err != nil {
-		log.Fatalf("force version not correctly", err)
+	if *forceFlag >= 0 {
+		m.Force(*forceFlag)
+		log.Println("Forced to version %f", *forceFlag)
 	}
 
-	if forceVersion >= 0 {
-		m.Force(forceVersion)
-		log.Println("Forced to version %f", forceVersion)
-	}
-
-	// up migration
-
-	if *stepFlag == "up" {
+	// up schema migration
+	if *stepFlag == "up" && !*onlyStateFlag {
 		if err := m.Up(); err != nil && err != migrate.ErrNoChange {
 			log.Fatalf("An error occurred while syncing the database.. %v", err)
 		}
 		log.Println("Database up migrated")
 	}
 
-	// up migration
-	if *stepFlag == "down" {
+	// down schema migration
+	if *stepFlag == "down" && !*onlyStateFlag {
 		if err := m.Down(); err != nil && err != migrate.ErrNoChange {
 			log.Fatalf("An error occurred while syncing the database.. %v", err)
 		}
 		log.Println("Database down migrated")
 	}
 
+	dbStateMigration(*tableFlag, *stepFlag)
+
 	os.Exit(0)
+}
+
+func dbStateMigration(table string, step string) {
+	if table == "payment" && step == "up" {
+		payment.Up()
+	}
+
+	if table == "payment" && step == "down" {
+		payment.Down()
+	}
+
+	if table == "transfer" && step == "up" {
+		transfer.Up()
+	}
+
+	if table == "transfer" && step == "down" {
+		transfer.Down()
+	}
+}
+
+func contains(s []string, e string) bool {
+	for _, a := range s {
+		if a == e {
+			return true
+		}
+	}
+	return false
 }

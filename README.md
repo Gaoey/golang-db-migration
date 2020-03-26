@@ -21,7 +21,7 @@ password: password
 ```
 4. create table "todolist"
 
-## Project base
+## Try To Run
 1. migrate up
 ```go run main.go -step up```
 2. migrate down
