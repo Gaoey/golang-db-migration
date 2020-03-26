@@ -59,18 +59,10 @@ func main() {
 
 	forceFlag := flag.Int("force", -1, "force version")
 	stepFlag := flag.String("step", "", "step up or down")
-	tableFlag := flag.String("table", "", "table selected")
+	databaseFlag := flag.String("database", "", "table selected")
 	onlyStateFlag := flag.Bool("only-state", false, "migrate only database state")
 
 	flag.Parse()
-
-	if *stepFlag == "" {
-		log.Fatalf("\nmandatory command -step \nexample -step=\"up\" or  -step=\"down\"")
-	}
-
-	if *tableFlag == "" && !contains(tableList, *tableFlag) {
-		log.Fatalf("\nplease selected table 'payment' or 'transfer' to migration \nexample -table=\"payment\"")
-	}
 
 	db, err := initDB()
 	if err != nil {
@@ -86,7 +78,7 @@ func main() {
 		log.Fatalf("could not start sql migration... %v", err)
 	}
 
-	migrationFile := fmt.Sprintf("file://migration/%s", *tableFlag)
+	migrationFile := fmt.Sprintf("file://migration/%s", *databaseFlag)
 	m, err := migrate.NewWithDatabaseInstance(migrationFile, "mysql", driver)
 	if err != nil {
 		log.Fatalf("migration failed... %v", err)
@@ -94,7 +86,16 @@ func main() {
 
 	if *forceFlag >= 0 {
 		m.Force(*forceFlag)
-		log.Println("Forced to version %f", *forceFlag)
+		log.Printf("forced to migration version %d", *forceFlag)
+		os.Exit(0)
+	}
+
+	if *stepFlag == "" {
+		log.Fatalf("\nmandatory command --step \nexample --step=\"up\" or  --step=\"down\"")
+	}
+
+	if *databaseFlag == "" && !contains(tableList, *databaseFlag) {
+		log.Fatalf("\nplease selected database 'payment' or 'transfer' to migration \nexample --table=\"payment\"")
 	}
 
 	// up schema migration
@@ -113,7 +114,7 @@ func main() {
 		log.Println("Database down migrated")
 	}
 
-	dbStateMigration(*tableFlag, *stepFlag)
+	dbStateMigration(*databaseFlag, *stepFlag)
 
 	os.Exit(0)
 }

@@ -23,12 +23,19 @@ password: password
 
 ## Try To Run
 1. migrate up
-```go run main.go -step up```
+```go run main.go --step up --table payment```
 2. migrate down
-```go run main.go -step down```
-3. force version
+```go run main.go --step down --table payment```
+3. hint. force version
 ```go run main.go -force <version>```
 
+## command
+|  command | description  | example   |
+|--------|----------------|----------------|
+| --force  | force migration version  | go run main.go --force 1  | 
+| --step |  step up or down | go run main.go --step up  |   
+| --database  |   select database (payment, transfer) |  go run main.go --step up --database payment  |   
+| --only-state  | migrate only database state (only data not include db schema)  |  go run main.go --step up --database payment --only-state|   
 
 ## CLI
 1. install migrate CLI see here: https://github.com/golang-migrate/migrate/tree/master/cmd/migrate
